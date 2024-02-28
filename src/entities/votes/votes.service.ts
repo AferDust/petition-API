@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from "typeorm";
 import { Petition } from '../petitions/petitions.entity';
 import { User } from '../users/users.entity';
-import { VoteCreateDto } from './dto/vote.create.dto';
+import { VoteCreateDto } from './dto';
 import { Vote } from './votes.entity';
 
 

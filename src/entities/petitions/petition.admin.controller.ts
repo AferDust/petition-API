@@ -1,9 +1,7 @@
 import { Body, Controller, Delete, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Put, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { AccessGuard } from "src/auth/guards/access.guard";
-import { IsAdminGuard } from "src/auth/guards/admin.guard";
-import { PetitionAdminCreateDto } from "./dto";
-import { PetitionAdminUpdateDto } from "./dto/admin/petition.admin.update";
+import { AccessGuard, IsAdminGuard } from "../../auth/guards/";
+import { PetitionAdminCreateDto, PetitionAdminUpdateDto } from "./dto";
 import { PetitionAdminService } from "./petition.admin.service";
 import { Petition } from "./petitions.entity";
 

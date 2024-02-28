@@ -1,8 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from "typeorm";
-import { PetitionAdminCreateDto } from './dto';
-import { PetitionAdminUpdateDto } from './dto/admin/petition.admin.update';
+import { PetitionAdminCreateDto, PetitionAdminUpdateDto } from './dto';
 import { Petition } from './petitions.entity';
 
 

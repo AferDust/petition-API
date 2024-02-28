@@ -1,8 +1,7 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Request, UseGuards } from "@nestjs/common";
+import { Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Query, Request, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { AccessGuard } from "../../auth/guards/access.guard";
-import { PetitionListDto, PetitionRetrieveDto } from "./dto/user";
-import { PetitionVoteActionDto } from "./dto/user/petition.vote.action.dto";
+import { PetitionListDto, PetitionRetrieveDto, PetitionVoteActionDto } from "./dto";
 import { Petition } from "./petitions.entity";
 import { PetitionService } from "./petitions.service";
 
@@ -15,8 +14,8 @@ export class PetitionController {
 
     @Get()
     @HttpCode(HttpStatus.OK)
-    async findAll(): Promise<PetitionListDto[]> {
-        const petitions: Petition[] = await this.petitionService.findAll();
+    async findAll(@Query('sorting') sorting: "ASC" | "DESC"): Promise<PetitionListDto[]> {
+        const petitions: Petition[] = await this.petitionService.findAll(sorting);
         return this.mapInstancesToDto(petitions);
     }
 
@@ -26,25 +25,7 @@ export class PetitionController {
         @Param("id", ParseIntPipe) id: number,
     ): Promise<PetitionRetrieveDto> {
         const petition: Petition = await this.petitionService.findOne(id);
-
-        const votes = petition.votes.map(vote => ({
-            id: vote.id,
-            dateTime: vote.dateTime,
-            user: {
-                login: vote.user.login,
-            },
-        }));
-
-        const petitionRetrieveDto: PetitionRetrieveDto = {
-            id: petition.id,
-            name: petition.name,
-            description: petition.description,
-            createDate: petition.createdDate,
-            votesNumber: votes.length,
-            votes: votes,
-        };
-
-        return petitionRetrieveDto;
+        return this.mapInstanceToDto(petition);
     }
 
     @Get('all-voted-petitions')
@@ -52,7 +33,7 @@ export class PetitionController {
     @ApiBearerAuth()
     @UseGuards(AccessGuard)
     async allVotedPetitions(@Request() request): Promise<PetitionListDto[]> {
-        const petitions: Petition[] = await this.petitionService.findAllVotedPetitions(request.user.pk);
+        const petitions: Petition[] = await this.petitionService.findAllVotedPetitionsOfUser(request.user.pk);
         return this.mapInstancesToDto(petitions);
     }
 
@@ -78,6 +59,27 @@ export class PetitionController {
         return this.petitionService.removeVote(petitionVoteActionDto.id, request.user.pk);
     }
 
+    @Get('filter-date-range')
+    async findFilteredPetitions(
+        @Query('startDate') startDate?: Date,
+        @Query('endDate') endDate?: Date,
+    ): Promise<PetitionListDto[]> {
+        startDate = (!startDate && !endDate) ? new Date() : startDate;
+        const petitions: Petition[] =
+            await this.petitionService.findFilteredPetitionsByDate(startDate, endDate);
+
+        return this.mapInstancesToDto(petitions);
+    }
+
+    @Get('filter-more-votes')
+    async findPetitionsWithMoreVotes(
+        @Query('min') minVotes: number
+    ): Promise<PetitionListDto[]> {
+        const petitions: Petition[] =
+            await this.petitionService.findPetitionsWithMoreVotes(minVotes ? minVotes : 0);
+
+        return this.mapInstancesToDto(petitions);
+    }
 
     mapInstancesToDto(instances: Petition[]): PetitionListDto[] {
         const petitionListDtos: PetitionListDto[] = instances.map(petition => {
@@ -90,5 +92,26 @@ export class PetitionController {
         });
 
         return petitionListDtos;
+    }
+
+    mapInstanceToDto(instance: Petition): PetitionRetrieveDto {
+        const votes = instance.votes.map(vote => ({
+            id: vote.id,
+            dateTime: vote.dateTime,
+            user: {
+                login: vote.user.login,
+            },
+        }));
+
+        const petitionRetrieveDto: PetitionRetrieveDto = {
+            id: instance.id,
+            name: instance.name,
+            description: instance.description,
+            createDate: instance.createdDate,
+            votesNumber: votes.length,
+            votes: votes,
+        };
+
+        return petitionRetrieveDto;
     }
 }

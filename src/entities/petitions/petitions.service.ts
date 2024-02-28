@@ -16,12 +16,21 @@ export class PetitionService {
         private readonly voteService: VoteService
     ) { }
 
-    async findAll(): Promise<Petition[]> {
-        return this.petitionRepository.find({
-            relations: {
-                votes: true,
-            }
-        });
+    async findAll(sorting: "ASC" | "DESC"): Promise<Petition[]> {
+        if (!sorting)
+            return this.petitionRepository.find({
+                relations: {
+                    votes: true,
+                }
+            });
+
+        return this.petitionRepository
+            .createQueryBuilder('petition')
+            .leftJoinAndSelect('petition.votes', 'votes')
+            .groupBy('petition.id')
+            .orderBy('COUNT(votes.id)', sorting)
+            .getMany();
+
     }
 
     async findOne(id: number): Promise<Petition> {
@@ -33,7 +42,7 @@ export class PetitionService {
         });
     }
 
-    async findAllVotedPetitions(userId: number): Promise<Petition[]> {
+    async findAllVotedPetitionsOfUser(userId: number): Promise<Petition[]> {
         const petitions: Petition[] = await this.petitionRepository.createQueryBuilder('petition')
             .innerJoin('petition.votes', 'vote')
             .innerJoin('vote.user', 'user')
@@ -54,4 +63,22 @@ export class PetitionService {
         return this.voteService.removeVote(id, userId);
     }
 
+
+    async findFilteredPetitionsByDate(startDate?: Date, endDate?: Date): Promise<Petition[]> {
+        let query = this.petitionRepository.createQueryBuilder('petition');
+
+        query = startDate ? query.andWhere('petition.createdDate >= :startDate', { startDate }) : query;
+        query = endDate ? query.andWhere('petition.createdDate <= :endDate', { endDate }) : query;
+
+        return await query.getMany();
+    }
+
+    async findPetitionsWithMoreVotes(minVotes: number): Promise<Petition[]> {
+        return await this.petitionRepository
+            .createQueryBuilder('petition')
+            .leftJoinAndSelect('petition.votes', 'votes')
+            .groupBy('petition.id')
+            .having('COUNT(votes.id) > :minVotes', { minVotes })
+            .getMany();
+    }
 }
