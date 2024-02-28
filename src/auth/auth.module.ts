@@ -1,9 +1,11 @@
 import { Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
+import * as dotenv from "dotenv";
 import { UserModule } from "../entities/users/users.module";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 
+dotenv.config();
 
 @Module({
     imports: [
@@ -21,3 +23,4 @@ import { AuthService } from "./auth.service";
 export class AuthModule { }
 
 console.log(process.env.JWT_SECRET);
+

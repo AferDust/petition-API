@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './database/database.module';
 import { PetitionsModule } from './entities/petitions/petitions.module';
 import { UserModule } from './entities/users/users.module';
@@ -11,7 +12,8 @@ import { VotesModule } from './entities/votes/votes.module';
     DatabaseModule,
     PetitionsModule,
     VotesModule,
-    UserModule
+    UserModule,
+    AuthModule
   ],
   controllers: [],
   providers: [],
