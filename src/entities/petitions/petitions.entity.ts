@@ -6,15 +6,17 @@ export class Petition {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({ name: "name", type: "varchar" })
     name: string;
 
-    @Column()
+    @Column({ name: "description", type: "varchar" })
     description: string;
 
     @CreateDateColumn()
     createdDate: Date;
 
-    @OneToMany(() => Vote, vote => vote.petition)
+    @OneToMany(() => Vote, vote => vote.petition, {
+        cascade: ["remove"],
+    })
     votes: Vote[];
 }

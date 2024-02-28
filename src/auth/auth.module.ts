@@ -5,6 +5,7 @@ import { UserModule } from "../entities/users/users.module";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { AccessGuard } from "./guards/access.guard";
+import { IsAdminGuard } from "./guards/admin.guard";
 import { LocalStrategy } from "./strategies/local.strategies";
 
 dotenv.config();
@@ -19,7 +20,7 @@ dotenv.config();
         }),
     ],
     controllers: [AuthController],
-    providers: [AuthService, AccessGuard, LocalStrategy],
+    providers: [AuthService, AccessGuard, IsAdminGuard, LocalStrategy],
     exports: [AuthService],
 })
 export class AuthModule { }

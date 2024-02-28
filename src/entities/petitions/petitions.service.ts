@@ -17,18 +17,31 @@ export class PetitionService {
     ) { }
 
     async findAll(): Promise<Petition[]> {
-        return this.petitionRepository.find();
+        return this.petitionRepository.find({
+            relations: {
+                votes: true,
+            }
+        });
     }
 
     async findOne(id: number): Promise<Petition> {
         return this.petitionRepository.findOne({
             where: { id },
             relations: {
-                votes: true
+                votes: { user: true },
             }
         });
     }
 
+    async findAllVotedPetitions(userId: number): Promise<Petition[]> {
+        const petitions: Petition[] = await this.petitionRepository.createQueryBuilder('petition')
+            .innerJoin('petition.votes', 'vote')
+            .innerJoin('vote.user', 'user')
+            .where('user.id = :userId', { userId })
+            .getMany();
+
+        return petitions;
+    }
 
     async giveVote(id: number, userId: number) {
         const user: User = await this.userService.findOneById(userId);
@@ -38,7 +51,7 @@ export class PetitionService {
     }
 
     async removeVote(id: number, userId: number) {
-
+        return this.voteService.removeVote(id, userId);
     }
 
 }

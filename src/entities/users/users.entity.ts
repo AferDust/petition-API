@@ -12,7 +12,10 @@ export class User {
     @Column()
     password: string;
 
+    @Column({ name: "is_admin", type: "boolean", default: false })
+    isAdmin: boolean;
 
     @OneToMany(() => Vote, vote => vote.user)
     votes: Vote[];
+
 }

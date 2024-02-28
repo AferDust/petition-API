@@ -10,7 +10,9 @@ export class Vote {
     @ManyToOne(() => User, user => user.votes)
     user: User;
 
-    @ManyToOne(() => Petition, petition => petition.votes)
+    @ManyToOne(() => Petition, petition => petition.votes, {
+        onDelete: "SET NULL",
+    })
     petition: Petition;
 
     @CreateDateColumn()
