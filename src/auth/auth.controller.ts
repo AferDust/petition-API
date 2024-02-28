@@ -4,8 +4,9 @@ import { ApiTags } from "@nestjs/swagger";
 import { UserCreateDto } from "src/entities/users/dto/user.create.dto";
 import { AuthService } from "./auth.service";
 import { JwtRefreshDto } from "./dto/auth.refresh.dto";
+import { SignInDto } from "./dto/auth.signIn.dto";
 
-@ApiTags("auth")
+@ApiTags("Auth")
 @Controller("auth")
 export class AuthController {
     constructor(private readonly authService: AuthService) { }
@@ -13,7 +14,7 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @UseGuards(AuthGuard('local'))
     @Post('login')
-    async login(@Request() req) {
+    async signIn(@Body() signInDto: SignInDto, @Request() req) {
         return this.authService.signIn(req.user);
     }
 

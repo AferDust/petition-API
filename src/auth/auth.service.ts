@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UserCreateDto } from 'src/entities/users/dto/user.create.dto';
@@ -14,7 +14,7 @@ export class AuthService {
 
     async validateUser(login: string, password: string): Promise<User> {
         const user: User = await this.userService.findOneByLogin(login);
-        this.isUser(user);
+        this.isNotUserExists(user);
 
         this.isMatch(password, user.password);
         return user;
@@ -58,15 +58,16 @@ export class AuthService {
 
     areUserExists(instance: User) {
         if (instance)
-            throw new BadRequestException('email already exists');
+            throw new BadRequestException('User already exists');
     }
 
-    isUser(instance: User) {
+    isNotUserExists(instance: User) {
         if (!instance)
             throw new BadRequestException('User not found');
     }
 
-    isMatch(userPassword: string, typedPassword: string): boolean {
-        return bcrypt.compareSync(userPassword, typedPassword);
+    isMatch(userPassword: string, typedPassword: string) {
+        if (!bcrypt.compareSync(userPassword, typedPassword))
+            throw new UnauthorizedException('Login or password incorrect');
     }
 }

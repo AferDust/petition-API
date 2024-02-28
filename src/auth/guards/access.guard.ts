@@ -3,10 +3,10 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../../entities/users/user.service';
 
 @Injectable()
-export class JwtAccessGuard implements CanActivate {
+export class AccessGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly usersService: UserService
+    private readonly userService: UserService
   ) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -26,7 +26,7 @@ export class JwtAccessGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    const user = await this.usersService.findOneById(request.user.id);
+    const user = await this.userService.findOneById(request.user.id);
     if (!user)
       throw new BadRequestException("User with this id not found in database");
 
