@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Petition } from './petition.entity';
+import { Petition } from './petitions.entity';
 
 @Module({
     imports: [

@@ -15,10 +15,6 @@ export class Petition {
     @CreateDateColumn()
     createdDate: Date;
 
-    @Column({ default: 0 })
-    voteCount: number;
-
-
     @OneToMany(() => Vote, vote => vote.petition)
     votes: Vote[];
 }

@@ -1,5 +1,5 @@
 import { CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Petition } from '../petitions/petition.entity';
+import { Petition } from '../petitions/petitions.entity';
 import { User } from "../users/users.entity";
 
 @Entity()

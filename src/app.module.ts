@@ -1,19 +1,19 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
 import { PetitionsModule } from './entities/petitions/petitions.module';
-import { UsersModule } from './entities/users/users.module';
+import { UserModule } from './entities/users/users.module';
 import { VotesModule } from './entities/votes/votes.module';
 
 @Module({
   imports: [
+    ConfigModule,
     DatabaseModule,
     PetitionsModule,
     VotesModule,
-    UsersModule
+    UserModule
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule { }
