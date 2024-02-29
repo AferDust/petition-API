@@ -19,7 +19,7 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: petition_app
+      POSTGRES_DB: petition-db
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
     volumes:
