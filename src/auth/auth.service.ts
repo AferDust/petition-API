@@ -36,7 +36,7 @@ export class AuthService {
     }
 
     private async getAccessRefreshToken(user: User) {
-        const payload = { pk: user.id, login: user.login };
+        const payload = { pk: user.id, login: user.login, isAdmin: user.isAdmin };
         console.log("get-tokens", user);
 
         return {
@@ -49,7 +49,7 @@ export class AuthService {
 
     async refreshJWTToken(refreshToken: string) {
         const decodedToken = await this.jwtService.verify(refreshToken);
-        const payload = { pk: decodedToken.pk, login: decodedToken.login };
+        const payload = { pk: decodedToken.pk, login: decodedToken.login, isAdmin: decodedToken.isAdmin };
 
         return {
             access: await this.jwtService.signAsync(payload),

@@ -17,7 +17,8 @@ export class PetitionAdminController {
     @Post()
     @HttpCode(HttpStatus.CREATED)
     async create(@Body() createDto: PetitionAdminCreateDto): Promise<Petition> {
-        return this.petitionAdminService.createPetition(createDto);
+        console.log("I'm in create")
+        return this.petitionAdminService.create(createDto);
     }
 
     @Put("/:id")
@@ -26,7 +27,7 @@ export class PetitionAdminController {
         @Param("id", ParseIntPipe) id: number,
         @Body() updateData: PetitionAdminUpdateDto
     ): Promise<Petition> {
-        return this.petitionAdminService.updatePetition(id, updateData);
+        return this.petitionAdminService.update(id, updateData);
     }
 
 

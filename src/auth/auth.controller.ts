@@ -13,12 +13,12 @@ export class AuthController {
 
     @HttpCode(HttpStatus.OK)
     @UseGuards(AuthGuard('local'))
-    @Post('login')
+    @Post('sign-in')
     async signIn(@Body() signInDto: SignInDto, @Request() req) {
         return this.authService.signIn(req.user);
     }
 
-    @Post("register")
+    @Post("sign-up")
     @HttpCode(HttpStatus.CREATED)
     register(@Body() userData: UserCreateDto) {
         return this.authService.register(userData);

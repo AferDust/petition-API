@@ -12,12 +12,14 @@ export class PetitionAdminService {
         private readonly petitionRepository: Repository<Petition>,
     ) { }
 
-    async createPetition(createDto: PetitionAdminCreateDto): Promise<Petition> {
+    async create(createDto: PetitionAdminCreateDto): Promise<Petition> {
+        console.log("Step 1");
         const createdInstance: Petition = this.petitionRepository.create(createDto);
+        console.log("Step 2");
         return this.petitionRepository.save(createdInstance);
     }
 
-    async updatePetition(id: number, updateDto: PetitionAdminUpdateDto): Promise<Petition> {
+    async update(id: number, updateDto: PetitionAdminUpdateDto): Promise<Petition> {
         const { name, description } = updateDto;
 
         const petition = await this.petitionRepository.findOne({ where: { id } });

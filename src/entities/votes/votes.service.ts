@@ -29,7 +29,8 @@ export class VoteService {
         this.isExists(instance);
 
 
-        return this.create({ user: user, petition: petition });
+        const savedInstance: Vote = await this.create({ user: user, petition: petition });
+        return savedInstance.petition;
     }
 
 

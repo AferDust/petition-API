@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from "typeorm";
 import { UserService } from '../users/user.service';
@@ -27,24 +27,27 @@ export class PetitionService {
         return this.petitionRepository
             .createQueryBuilder('petition')
             .leftJoinAndSelect('petition.votes', 'votes')
-            .groupBy('petition.id')
+            .groupBy('petition.id, votes.id')
             .orderBy('COUNT(votes.id)', sorting)
             .getMany();
 
     }
 
     async findOne(id: number): Promise<Petition> {
-        return this.petitionRepository.findOne({
+        const instance: Petition = await this.petitionRepository.findOne({
             where: { id },
             relations: {
                 votes: { user: true },
             }
         });
+        this.isNotExists(instance, id);
+
+        return instance;
     }
 
     async findAllVotedPetitionsOfUser(userId: number): Promise<Petition[]> {
         const petitions: Petition[] = await this.petitionRepository.createQueryBuilder('petition')
-            .innerJoin('petition.votes', 'vote')
+            .leftJoinAndSelect('petition.votes', 'vote')
             .innerJoin('vote.user', 'user')
             .where('user.id = :userId', { userId })
             .getMany();
@@ -54,7 +57,9 @@ export class PetitionService {
 
     async giveVote(id: number, userId: number) {
         const user: User = await this.userService.findOneById(userId);
+
         const instance: Petition = await this.petitionRepository.findOne({ where: { id } });
+        this.isNotExists(instance, id);
 
         return this.voteService.giveVote(user, instance);
     }
@@ -64,11 +69,10 @@ export class PetitionService {
     }
 
 
-    async findFilteredPetitionsByDate(startDate?: Date, endDate?: Date): Promise<Petition[]> {
-        let query = this.petitionRepository.createQueryBuilder('petition');
-
-        query = startDate ? query.andWhere('petition.createdDate >= :startDate', { startDate }) : query;
-        query = endDate ? query.andWhere('petition.createdDate <= :endDate', { endDate }) : query;
+    async findFilteredPetitionsByDate(startDate?: Date): Promise<Petition[]> {
+        let query = this.petitionRepository.createQueryBuilder('petition')
+            .leftJoinAndSelect('petition.votes', 'votes')
+            .andWhere('petition.createdDate >= :startDate', { startDate });
 
         return await query.getMany();
     }
@@ -77,8 +81,14 @@ export class PetitionService {
         return await this.petitionRepository
             .createQueryBuilder('petition')
             .leftJoinAndSelect('petition.votes', 'votes')
-            .groupBy('petition.id')
-            .having('COUNT(votes.id) > :minVotes', { minVotes })
+            .groupBy('petition.id, votes.id')
+            .having('COUNT(votes.id) >= :minVotes', { minVotes })
             .getMany();
+    }
+
+    isNotExists(instance: Petition, id: number) {
+        if (!instance)
+            throw new NotFoundException(`Petition with ID ${id} not found`);
+
     }
 }

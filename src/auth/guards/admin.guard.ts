@@ -9,6 +9,7 @@ export class IsAdminGuard implements CanActivate {
         const request = context.switchToHttp().getRequest();
         const user = request.user;
 
+        console.log("In admin Guard");
         return user.isAdmin;
     }
 }

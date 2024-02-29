@@ -6,5 +6,5 @@ export class PetitionVoteActionDto {
     @ApiProperty()
     @IsInt()
     @Validate(IsPetitionExists)
-    id: number;
+    petitionId: number;
 }

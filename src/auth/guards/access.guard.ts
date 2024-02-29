@@ -1,5 +1,6 @@
 import { BadRequestException, CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Request } from 'express';
 import { UserService } from '../../entities/users/user.service';
 
 @Injectable()
@@ -10,42 +11,36 @@ export class AccessGuard implements CanActivate {
   ) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    console.log("I'm here");
     const request = context.switchToHttp().getRequest();
 
+    console.log("Step 1");
     const token = this.extractJwtFromHeaders(request);
     if (!token)
       throw new UnauthorizedException();
-
+    console.log("Step 2");
     try {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_SECRET,
       });
       request["user"] = payload;
 
+      console.log("Step 3");
     } catch {
       throw new UnauthorizedException();
     }
-
+    console.log("Step 4");
     const user = await this.userService.findOneById(request.user.id);
     if (!user)
       throw new BadRequestException("User with this id not found in database");
 
-
+    console.log("Step 5");
     return true;
   }
 
-  private extractJwtFromHeaders(request: any): string | null {
-    const authHeader = request.headers.authorization;
-    if (!authHeader)
-      return null;
-
-
-    const parts = authHeader.split(' ');
-    if (parts.length !== 2 || parts[0] !== 'Bearer') {
-      return null;
-    }
-
-    const token = parts[1];
-    return token;
+  private extractJwtFromHeaders(request: Request): string | undefined {
+    const [type, token] = request.headers.authorization?.split(" ") ?? [];
+    return type === "Bearer" ? token : undefined;
   }
+
 }
