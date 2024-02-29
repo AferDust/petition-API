@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Put, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { AccessGuard, IsAdminGuard } from "../../auth/guards/";
+import { AccessGuard } from "../../auth/guards/";
 import { PetitionAdminCreateDto, PetitionAdminUpdateDto } from "./dto";
 import { PetitionAdminService } from "./petition.admin.service";
 import { Petition } from "./petitions.entity";
@@ -8,7 +8,7 @@ import { Petition } from "./petitions.entity";
 @ApiTags("Admin-Petition")
 @Controller("admin-petition")
 @ApiBearerAuth()
-@UseGuards(AccessGuard, IsAdminGuard)
+@UseGuards(AccessGuard)
 export class PetitionAdminController {
     constructor(
         private readonly petitionAdminService: PetitionAdminService
