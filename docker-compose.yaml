@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - CLOUD_DATABASE_HOST=postgres
+      - CLOUD_DATABASE_NAME=petition-db
+      - CLOUD_DATABASE_USERNAME=root
+      - CLOUD_DATABASE_PASSWORD=root
+      - JWT_SECRET=cto-let-petition
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: petition_app
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
